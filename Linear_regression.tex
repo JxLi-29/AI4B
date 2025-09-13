@@ -1,0 +1,175 @@
+% !TEX program = xelatex
+\documentclass[a4paper, 12pt]{article}
+\usepackage{geometry}  % 页面布局
+\geometry{left=2.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm}
+
+\usepackage{xeCJK}  % 中文支持
+\setCJKmainfont{Kai}  % macOS 可改为 STKaiti
+\setCJKmonofont{Kai}  % 等宽字体
+
+\usepackage{amsmath, amssymb, amsthm} % 数学公式
+\newtheorem{lemma}{Lemma}
+\usepackage{graphicx}  % 插入图片
+\usepackage{xcolor}  % 颜色支持
+\usepackage{listings}  % 代码块
+\usepackage{hyperref}  % 超链接
+\usepackage{fancyhdr}  % 页眉页脚
+\usepackage{enumitem}  % 调整列表
+% 页面设置
+\geometry{margin=2.5cm}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{}
+\fancyhead[R]{}
+\fancyfoot[C]{\thepage}
+
+% 数学命令自定义
+\newcommand{\E}{\mathbb{E}}      % 期望
+\newcommand{\Var}{\mathrm{Var}} % 方差
+\newcommand{\Pp}{\mathbb{P}}    % 概率符号
+
+\title{AI for biology}
+\author{JxLi}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\section{Supervised Learning}
+\subsection{Linear Regression}
+\subsubsection{simple linear regression}
+In simple linear regression ,we model the relationship between a single variable $x$ and a dependent variable $y$ using a linear function:
+$$y = \beta_0+\beta_1 x+ \varepsilon$$
+where 
+\begin{itemize}
+	\item $y$ is the dependent variable.
+	\item $x$ is the independent variable.
+	\item $\beta_0$ is the intercept.
+	\item $\beta_1$ is the slope coefficient.
+	\item $\varepsilon$ is the random error term.
+\end{itemize}
+The difference between the observed value $y_i$ and the predicted value $\hat{y_i}$ is called the residual:
+$$e_i=y_i-\hat{y_i}$$
+Suppose our regression model is:
+$$y_i=\beta_0+\beta_1 x_i +\varepsilon_i,$$
+where we assume the errors$\varepsilon_i$ are independent and normally distributed:
+$$\varepsilon_i ~ N(0,\sigma^2).$$
+This means each observed value $y_i$ is a random variable with density:
+$$p(y_i|x_i,\beta_0,\beta_1,\sigma)=\frac{1}{\sqrt{2\pi \sigma^2}}exp(-\frac{(y_i-\beta_0-\beta_1x_i)^2}{2\sigma^2}).$$
+The likelihood of observing all data points is:
+$$L(\beta_0,\beta_1,\sigma)=\prod_{i=1}^{n}p(y_i|x_i,\beta_0,\beta_1,\sigma)$$
+We need to find the $\hat{\beta_0},\hat{\beta_1},\hat{\sigma}$,that maximize $L(\beta_0,\beta_1,\sigma)$,which means
+$$max \prod_{i=1}^{n}p(y_i|x_i,\beta_0,\beta_1,\sigma)\Leftrightarrow max (\frac{1}{\sqrt{2\pi \sigma^2}})^n exp(-\frac{\sum_{i=1}^{n}(y_i-\beta_0-\beta_1 x_i)^2}{2\sigma^2})$$
+For fixed $\sigma$,maximizing $L(\beta_0,\beta_1)$is equivalent to minimizing $\sum_{i=1}^{n}(y_i-\beta_0-\beta_1x_i)^2$,which is exactly the sum of squared residuals.\\
+From a probability perspective ,we prove that using the sum of squared residuals(SSR) to evaluate the loss of function is mathematically reasonable.\\
+To figure out the right parameters ,we try as follows:
+$$f(\beta_0,\beta_1)=\sum_{i=1}^{n}(y_i-\beta_0-\beta_1x_i)^2,$$ 
+$$\frac{\partial{f}}{\partial \beta_0}=\frac{\partial{f}}{\partial \beta_0}=0,$$
+$$\sum_{i=1}^{n}y_i-\beta_0 -\beta_1 x_i=0,\sum_{i=1}^{n}x_i(y_i-\beta_0-\beta_1x_i)=0$$
+$$\beta_0=\hat{y_i}-\beta_1\hat{x_i},\sum_{i=1}^{n}x_i(y_i-\hat{y_i}-\beta_1(x_i-\hat{x_i}))$$
+$$\beta_1=\frac{\sum_{i=1}^n x_i(y_i-\hat{y_i})}{\sum_{i=1}^n x_i(x_i-\hat{x_i})}=\frac{\sum_{i=1}^n (x_i-\hat{x_i})(y_i-\hat{y_i})}{\sum_{i=1}^n (x_i-\hat{x_i})^2}$$
+\subsubsection{multiple linear regression}
+In matrix notation ,the multiple linear regression can be written as follows:
+$$y = X \beta + \varepsilon$$
+where 
+\begin{itemize}
+  \item $y$ is the $n \times 1$ vector 
+  \item $X$ is the $n \times (p+1)$ matrix
+  \item $\beta$ is the $(p+1) \times 1$ vector of regression coefficients
+  \item $\varepsilon$ is the $n\times 1$vector of random error terms ,assumed to follow $\varepsilon~ N(0,\sigma^2 I)$  
+\end{itemize}
+Similarly ,the least squares estimator of $\beta$ is obtained by minimizing the sum of squared residuals:
+$$\hat{\beta} = arg\min_{\beta}||y-X\beta||^2.\footnote{The notation of $arg$ means to find a argument that satisfy the requirements of the subsequent function .In the text ,we are saying "Find the vector $\beta$ that makes the sum of the squared residuals as small as possible."}$$
+which comes from as follows:
+$$p(y|X,\beta,\sigma)=\frac{1}{\sqrt{2\pi \sigma^2}}exp(-\frac{1}{2\sigma^2}\underbrace{(y-X\beta)^T(y-X\beta)}_{||y-X\beta||^2})$$
+$$L(\beta,\sigma)=\prod_{i=1}^{n}p(y_i|x_i^T,\beta,\sigma)=\prod_{i=1}^{n}p(y_i|X,\beta,\sigma)=p(y|x_i^T,\beta,\sigma) .\footnote{Normally ,we take $x_i$ as a column vector and $x_i^T$ as a row vector.}$$
+For the same reason ,we find the targeted $\beta$ only when function $(y-X\beta)^T(y-X\beta)$ get minimized.\\
+$$(y-X\beta)^T(y-X\beta)=(y^T-\beta^TX^T)(y-X\beta)=y^Ty+(X\beta)^TX\beta-\beta^TX^Ty-y^TX\beta$$
+Since $y^TX\beta$ is a scalar ,$y^TX\beta=\beta^TX^Ty$
+$$(y-X\beta)^T(y-X\beta)=y^Ty+(X\beta)^TX\beta-2y^TX\beta.$$
+To explain it from a higher perspective ,I want to introduce the matrix calculus rules .\\
+Firstly ,let's assume a vector $e={e_1,e_2,\cdots,e_n}$
+$$\frac{\partial{e^Te}}{\partial{e}}=\frac{\sum_{i=1}^{n}e_i^2}{\partial e}=2e$$
+Then ,
+$$\frac{\partial{(y-X\beta)^T(y-X\beta)}}{\partial \beta}=\frac{ \partial (y^Ty+(X\beta)^TX\beta-2y^TX\beta)}{\partial \beta}=\frac{\partial{(\beta^TX^TX\beta)}}{\partial \beta}-2X^Ty$$
+\begin{equation}
+\frac{\partial{(\beta^TX^TX\beta)}}{\partial \beta}=(\frac{\partial{(X\beta)}}{\partial \beta})^T\frac{\partial{(\beta^TX^TX\beta)}}{\partial{(X\beta)}}=2X^TX\beta 
+\tag{1}	
+\end{equation}
+Equation (1) comes from multivariable chain rule:
+$$\nabla_\beta f= J_{v,\beta}^{T}\nabla_v f,$$
+where
+\begin{itemize}
+  \item $J_{v,\beta}=\frac{\partial v}{\partial \beta}$ is the Jacobian of $v$ w.r.t. $\beta$
+  \item $\nabla_v f$ is the gradient w.r.t. $v$
+\end{itemize}
+To review the concept of Jacobian,we take multivariable function $f$ and column vector $ x=[x_1,x_2,\cdots, x_n] ^T$:
+$$
+J_{f,x}=\begin{bmatrix}
+	\dfrac{\partial f_1}{\partial x_1} & \dfrac{\partial f_1}{\partial x_2} &\dfrac{\partial f_1}{\partial x_3} & \cdots & \dfrac{\partial f_1}{\partial x_n}\\
+	\dfrac{\partial f_2}{\partial x_1} & \dfrac{\partial f_2}{\partial x_2} &\dfrac{\partial f_2}{\partial x_3} & \cdots & \dfrac{\partial f_2}{\partial x_n}\\
+	\vdots & \vdots & \vdots &\cdots & \vdots \\
+	\dfrac{\partial f_m}{\partial x_1} & \dfrac{\partial f_m}{\partial x_2} &\dfrac{\partial f_m}{\partial x_3} & \cdots & \dfrac{\partial f_m}{\partial x_n}
+\end{bmatrix} ,J_{f,x}(i;j) =\frac{\partial f_i}{\partial x_j}
+$$
+As for our case ,
+$$J_{v,\beta}^T=(\frac{\partial{(X\beta)}}{\partial \beta})^T = X^T .$$
+Now we can solve the $\hat \beta$ we want:
+$$\frac{\partial{(y-X\beta)^T(y-X\beta)}}{\partial \beta}=2X^T(X\beta -y)= 0$$
+if the $X^TX$ is invertible
+$$(X^TX)^{-1}X^TX\beta =(X^TX)^{-1} X^Ty$$
+$$\hat \beta = (X^TX)^{-1} X^Ty$$
+else ,like the $X$ is not full ranked,we need to use the Moore-Penrose pseudoinverse:
+$$\hat \beta = X^+y$$
+where $X^+ = (X^TX)^+X^T .\footnote{We will talk about it later if possible}$
+\subsubsection{post-estimation analysis}
+We always need a way to evaluate our function ,and it is called post-estimation analysis.\\
+Take multivariable linear regression for an example ,we do as follows:\\
+First ,get our predicted values
+$$\hat y=X\hat \beta .$$
+Calculate the residual:
+$$r=y- \hat y$$
+To evaluate the residual without bias ,we divided the squared residual by degrees of freedom(DF) $n-(p+1)$:
+$$\hat \sigma^2 = \frac{r^Tr}{n-(p+1)}$$
+Why is it unbiased?
+$$r=y-X\hat \beta= y- X(X^TX)^{-1}X^Ty =(I-H)y$$
+where $H=X(X^TX)^{-1}X^T$ is the hat matrix ,which put a hat on $y$ to transform it to $\hat y$\\
+as for hat matrix ,it has some good properties:\begin{itemize}
+  \item Symmetric: $H=H^T$
+  \item Idempotent: $H^2=H$ 
+\end{itemize}
+$$r= (I-H)(X\beta+\varepsilon)=(I-H)X\beta +(I-H)\varepsilon $$
+where $HX\beta = X\beta$
+$$r = (I-H)\varepsilon$$
+since $I-H$ is symmetric and idempotent ,$(I-H)^T(I-H) = (I-H)^2 =I-H$
+$$r^Tr =\varepsilon^T(I-H)^T(I-H)\varepsilon =\varepsilon^T(I-H)\varepsilon $$
+$$\mathbb{E}(r^Tr) = \mathbb{E}(\varepsilon^T (I-H)\varepsilon)$$
+\begin{lemma}[Expectation of a quadratic form]
+Let $\varepsilon \in \mathbb{R}^m$ be a random vector with
+\[
+\mathbb{E}[\varepsilon] = 0, \quad \text{Cov}(\varepsilon) = \sigma^2 I_m,
+\]
+and let $A \in \mathbb{R}^{m \times m}$ be a symmetric matrix. Then
+\[
+\mathbb{E}[\varepsilon^\top A \varepsilon] = \sigma^2 \, \operatorname{tr}(A).
+\]
+\end{lemma}
+
+\begin{proof}
+Expand the quadratic form:
+\[
+\varepsilon^\top A \varepsilon = \sum_{i=1}^m \sum_{j=1}^m A_{ij} \varepsilon_i \varepsilon_j.
+\]
+Taking expectation:
+\[
+\mathbb{E}[\varepsilon^\top A \varepsilon] = \sum_{i=1}^m \sum_{j=1}^m A_{ij} \mathbb{E}[\varepsilon_i \varepsilon_j].
+\]
+Since $\text{Cov}(\varepsilon) = \sigma^2 I_m , \text{Cov}(\varepsilon_i,\varepsilon_j)= \E (\varepsilon_i- \E \varepsilon)(\varepsilon_j -\E \varepsilon_j)=\E(\varepsilon_i\varepsilon_j) $, we have $\mathbb{E}[\varepsilon_i \varepsilon_j] = 0$ for $i \neq j$ and $\mathbb{E}[\varepsilon_i^2] = \sigma^2$. Therefore, only diagonal terms remain:
+\[
+\mathbb{E}[\varepsilon^\top A \varepsilon] = \sum_{i=1}^m A_{ii} \sigma^2 = \sigma^2 \, \operatorname{tr}(A).
+\]
+\end{proof}
+$$\E (\varepsilon^T(I-H)\varepsilon)=\sigma^2 tr(I-H) =\sigma^2 (n -(p+1))$$
+$$\mathbb{E} (\hat{\sigma}^2)= \E(\sigma^2)$$
+This shows that $\hat \sigma^2$ is an unbiased estimator of the true error variance $\sigma^2$.
+\end{document}
