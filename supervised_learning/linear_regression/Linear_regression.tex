@@ -55,11 +55,11 @@ $$y_i=\beta_0+\beta_1 x_i +\varepsilon_i,$$
 where we assume the errors$\varepsilon_i$ are independent and normally distributed:
 $$\varepsilon_i ~ N(0,\sigma^2).$$
 This means each observed value $y_i$ is a random variable with density:
-$$p(y_i|x_i,\beta_0,\beta_1,\sigma)=\frac{1}{\sqrt{2\pi \sigma^2}}exp(-\frac{(y_i-\beta_0-\beta_1x_i)^2}{2\sigma^2}).$$
+$$\Pp(y_i|x_i,\beta_0,\beta_1,\sigma)=\frac{1}{\sqrt{2\pi \sigma^2}}exp(-\frac{(y_i-\beta_0-\beta_1x_i)^2}{2\sigma^2}).$$
 The likelihood of observing all data points is:
 $$L(\beta_0,\beta_1,\sigma)=\prod_{i=1}^{n}p(y_i|x_i,\beta_0,\beta_1,\sigma)$$
 We need to find the $\hat{\beta_0},\hat{\beta_1},\hat{\sigma}$,that maximize $L(\beta_0,\beta_1,\sigma)$,which means
-$$max \prod_{i=1}^{n}p(y_i|x_i,\beta_0,\beta_1,\sigma)\Leftrightarrow max (\frac{1}{\sqrt{2\pi \sigma^2}})^n exp(-\frac{\sum_{i=1}^{n}(y_i-\beta_0-\beta_1 x_i)^2}{2\sigma^2})$$
+$$max \prod_{i=1}^{n}\Pp(y_i|x_i,\beta_0,\beta_1,\sigma)\Leftrightarrow max (\frac{1}{\sqrt{2\pi \sigma^2}})^n exp(-\frac{\sum_{i=1}^{n}(y_i-\beta_0-\beta_1 x_i)^2}{2\sigma^2})$$
 For fixed $\sigma$,maximizing $L(\beta_0,\beta_1)$is equivalent to minimizing $\sum_{i=1}^{n}(y_i-\beta_0-\beta_1x_i)^2$,which is exactly the sum of squared residuals.\\
 From a probability perspective ,we prove that using the sum of squared residuals(SSR) to evaluate the loss of function is mathematically reasonable.\\
 To figure out the right parameters ,we try as follows:
@@ -76,19 +76,19 @@ where
   \item $y$ is the $n \times 1$ vector 
   \item $X$ is the $n \times (p+1)$ matrix
   \item $\beta$ is the $(p+1) \times 1$ vector of regression coefficients
-  \item $\varepsilon$ is the $n\times 1$vector of random error terms ,assumed to follow $\varepsilon~ N(0,\sigma^2 I)$  
+  \item $\varepsilon$ is the $n\times 1$vector of random error terms ,assumed to follow $\varepsilon \sim N(0,\sigma^2 I)$  
 \end{itemize}
 Similarly ,the least squares estimator of $\beta$ is obtained by minimizing the sum of squared residuals:
 $$\hat{\beta} = arg\min_{\beta}||y-X\beta||^2.\footnote{The notation of $arg$ means to find a argument that satisfy the requirements of the subsequent function .In the text ,we are saying "Find the vector $\beta$ that makes the sum of the squared residuals as small as possible."}$$
 which comes from as follows:
-$$p(y|X,\beta,\sigma)=\frac{1}{\sqrt{2\pi \sigma^2}}exp(-\frac{1}{2\sigma^2}\underbrace{(y-X\beta)^T(y-X\beta)}_{||y-X\beta||^2})$$
-$$L(\beta,\sigma)=\prod_{i=1}^{n}p(y_i|x_i^T,\beta,\sigma)=\prod_{i=1}^{n}p(y_i|X,\beta,\sigma)=p(y|x_i^T,\beta,\sigma) .\footnote{Normally ,we take $x_i$ as a column vector and $x_i^T$ as a row vector.}$$
+$$\Pp(y|X,\beta,\sigma)=\frac{1}{\sqrt{2\pi \sigma^2}}exp(-\frac{1}{2\sigma^2}\underbrace{(y-X\beta)^T(y-X\beta)}_{||y-X\beta||^2})$$
+$$L(\beta,\sigma)=\prod_{i=1}^{n}\Pp(y_i|x_i^T,\beta,\sigma)=\prod_{i=1}^{n}\Pp(y_i|X,\beta,\sigma)=\Pp(y|x_i^T,\beta,\sigma) .\footnote{Normally ,we take $x_i$ as a column vector and $x_i^T$ as a row vector.}$$
 For the same reason ,we find the targeted $\beta$ only when function $(y-X\beta)^T(y-X\beta)$ get minimized.\\
 $$(y-X\beta)^T(y-X\beta)=(y^T-\beta^TX^T)(y-X\beta)=y^Ty+(X\beta)^TX\beta-\beta^TX^Ty-y^TX\beta$$
 Since $y^TX\beta$ is a scalar ,$y^TX\beta=\beta^TX^Ty$
 $$(y-X\beta)^T(y-X\beta)=y^Ty+(X\beta)^TX\beta-2y^TX\beta.$$
 To explain it from a higher perspective ,I want to introduce the matrix calculus rules .\\
-Firstly ,let's assume a vector $e={e_1,e_2,\cdots,e_n}$
+Firstly ,let's assume a vector $e=[e_1,e_2,\cdots,e_n]$
 $$\frac{\partial{e^Te}}{\partial{e}}=\frac{\sum_{i=1}^{n}e_i^2}{\partial e}=2e$$
 Then ,
 $$\frac{\partial{(y-X\beta)^T(y-X\beta)}}{\partial \beta}=\frac{ \partial (y^Ty+(X\beta)^TX\beta-2y^TX\beta)}{\partial \beta}=\frac{\partial{(\beta^TX^TX\beta)}}{\partial \beta}-2X^Ty$$
@@ -100,10 +100,10 @@ Equation (1) comes from multivariable chain rule:
 $$\nabla_\beta f= J_{v,\beta}^{T}\nabla_v f,$$
 where
 \begin{itemize}
-  \item $J_{v,\beta}=\frac{\partial v}{\partial \beta}$ is the Jacobian of $v$ w.r.t. $\beta$
+  \item $J_{v,\beta}=\frac{\partial v}{\partial \beta}$ is the \textbf{Jacobian} of $v$ w.r.t. $\beta$
   \item $\nabla_v f$ is the gradient w.r.t. $v$
 \end{itemize}
-To review the concept of Jacobian,we take multivariable function $f$ and column vector $ x=[x_1,x_2,\cdots, x_n] ^T$:
+To review the concept of \textbf{Jacobian},we take multivariable function $f$ and column vector $ x=[x_1,x_2,\cdots, x_n] ^T$:
 $$
 J_{f,x}=\begin{bmatrix}
 	\dfrac{\partial f_1}{\partial x_1} & \dfrac{\partial f_1}{\partial x_2} &\dfrac{\partial f_1}{\partial x_3} & \cdots & \dfrac{\partial f_1}{\partial x_n}\\
@@ -119,7 +119,7 @@ $$\frac{\partial{(y-X\beta)^T(y-X\beta)}}{\partial \beta}=2X^T(X\beta -y)= 0$$
 if the $X^TX$ is invertible
 $$(X^TX)^{-1}X^TX\beta =(X^TX)^{-1} X^Ty$$
 $$\hat \beta = (X^TX)^{-1} X^Ty$$
-else ,like the $X$ is not full ranked,we need to use the Moore-Penrose pseudoinverse:
+else ,like the $X$ is not full ranked,we need to use the \textbf{Moore-Penrose pseudoinverse}:
 $$\hat \beta = X^+y$$
 where $X^+ = (X^TX)^+X^T .\footnote{We will talk about it later if possible}$
 \subsubsection{post-estimation analysis}
@@ -143,7 +143,7 @@ where $HX\beta = X\beta$
 $$r = (I-H)\varepsilon$$
 since $I-H$ is symmetric and idempotent ,$(I-H)^T(I-H) = (I-H)^2 =I-H$
 $$r^Tr =\varepsilon^T(I-H)^T(I-H)\varepsilon =\varepsilon^T(I-H)\varepsilon $$
-$$\mathbb{E}(r^Tr) = \mathbb{E}(\varepsilon^T (I-H)\varepsilon)$$
+$$\mathbb{E}[r^Tr] = \mathbb{E}[\varepsilon^T (I-H)\varepsilon]$$
 \begin{lemma}[Expectation of a quadratic form]
 Let $\varepsilon \in \mathbb{R}^m$ be a random vector with
 \[
@@ -164,12 +164,36 @@ Taking expectation:
 \[
 \mathbb{E}[\varepsilon^\top A \varepsilon] = \sum_{i=1}^m \sum_{j=1}^m A_{ij} \mathbb{E}[\varepsilon_i \varepsilon_j].
 \]
-Since $\text{Cov}(\varepsilon) = \sigma^2 I_m , \text{Cov}(\varepsilon_i,\varepsilon_j)= \E (\varepsilon_i- \E \varepsilon)(\varepsilon_j -\E \varepsilon_j)=\E(\varepsilon_i\varepsilon_j) $, we have $\mathbb{E}[\varepsilon_i \varepsilon_j] = 0$ for $i \neq j$ and $\mathbb{E}[\varepsilon_i^2] = \sigma^2$. Therefore, only diagonal terms remain:
+Since $\text{Cov}(\varepsilon) = \sigma^2 I_m , \text{Cov}(\varepsilon_i,\varepsilon_j)= \E [(\varepsilon_i- \E \varepsilon_i)(\varepsilon_j -\E \varepsilon_j)]=\E[\varepsilon_i\varepsilon_j] $, we have $\mathbb{E}[\varepsilon_i \varepsilon_j] = 0$ for $i \neq j$ and $\mathbb{E}[\varepsilon_i^2] = \sigma^2$. Therefore, only diagonal terms remain:
 \[
 \mathbb{E}[\varepsilon^\top A \varepsilon] = \sum_{i=1}^m A_{ii} \sigma^2 = \sigma^2 \, \operatorname{tr}(A).
 \]
 \end{proof}
-$$\E (\varepsilon^T(I-H)\varepsilon)=\sigma^2 tr(I-H) =\sigma^2 (n -(p+1))$$
-$$\mathbb{E} (\hat{\sigma}^2)= \E(\sigma^2)$$
-This shows that $\hat \sigma^2$ is an unbiased estimator of the true error variance $\sigma^2$.
+$$\E [\varepsilon^T(I-H)\varepsilon]=\sigma^2 tr(I-H) =\sigma^2 (n -(p+1))$$
+$$\mathbb{E} [\hat{\sigma}^2]= \E [\sigma^2]$$
+This shows that $\hat \sigma^2$ is an unbiased estimator of the true error variance $\sigma^2$.\\
+To compute the \textbf{R-squared} ,we firstly compute the \textbf{total sum of squares (TSS)} and the \textbf{residual sum of squares (RSS)}:
+$$TSS = \sum_{i=1}^n (y_i - \bar y)^2 =||y - \bar y \textbf{1}||^2_2$$
+$$RSS = \sum_{i=1}^n (y_i - \hat{y_i})^2 = ||y - \hat y||^2_2$$
+$$R^2 = 1- \dfrac {RSS}{TSS} = 1 - \dfrac{||y - \bar y \textbf{1}||^2_2}{||y - \hat y||^2_2}$$
+That is the normal way to get \textbf{R-squared} , if we take freedom degrees into thoughts ,the adjusted $R^2$ should be penalized as follows:
+$$R^2_{\text adj}= 1- \dfrac{RSS/(n-(p+1))}{TSS/(n-1)}$$
+Then , we can test the significance of the predictor :
+$$\hat \beta = (X^TX)^{-1}X^T y = (X^TX)^{-1}X^T (X\beta +\varepsilon)$$
+$$\text{Cov}(\hat \beta) = \text{Cov}((X^TX)^{-1}X^T\varepsilon) = (X^TX)^{-1}X^T\text{Cov}(\varepsilon) ((X^TX)^{-1}X^T)^T $$
+$$= (X^TX)^{-1}X^T \sigma^2 I((X^TX)^{-1}X^T)^T = \sigma^2 (X^TX)^{-1}X^TX(XX^T)^{-1}=\sigma^2 (X^TX)^{-1}$$
+And the variance of each component of $\hat \beta$ is given by the diagonal elements of the $\text{Cov} (\hat \beta) $:
+$$\Var(\hat \beta_i ) =\text{Cov}(\hat \beta)_{ii} = \sigma^2(X^TX)^{-1}_{ii}. $$
+Thus the standard errors of $\hat\beta_i$:
+$$SE(\hat \beta_i)=\sqrt{\sigma^2(X^TX)^{-1}_{ii}}$$
+To find that how many standard errors $\hat \beta$ away is from the hypothesized value ,we introduce the way of \textbf{t-statistics}:
+$$t_j= \frac{\hat\beta_j - \beta_{j,0}}{SE(\hat \beta_j)}$$
+where
+\begin{itemize}
+  \item $\hat \beta_j$ is the estimated coefficient
+  \item $\beta_{j,0}$ is the hypothesized true value under null hypothesis
+  \item $\SE{\hat \beta_j}$ is the estimated standard value 
+\end{itemize}
+
+
 \end{document}
